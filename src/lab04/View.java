@@ -7,16 +7,41 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class View extends JFrame {
-    View(Controller _controller) {
+    View(Controller _controller, boolean oneGUIForEachPlayer) {
         controller = _controller;
-        initGUI(true);
+        columns = controller.getBoardColumnLength();
+        rows = controller.getBoardRowLength();
+        buttons = new JButton[controller.getAmountOfPlayers()][columns][rows];
+        messageLabels = new JLabel[controller.getAmountOfPlayers()];
+
+        initGUI(oneGUIForEachPlayer);
+
     }
 
     private Controller controller;
-    private boolean gameOver;
+    private int rows;
+    private int columns;
+    private boolean gameOver = false;
+    private JLabel messageLabels[];
+    private JButton buttons[][][];
+
+    public void gameIsOver() {
+        gameOver = true;
+    }
+
+    public void updateBoardText(String message) {
+        for (int i = 0; i < messageLabels.length; i++) {
+            messageLabels[i].setText(message);
+        }
+    }
+    
+    public void updateBoardButton(int column, int row, char symbol) {
+        for (int i = 0; i < controller.getAmountOfPlayers(); i++) {
+            buttons[i][column][row].setText(String.valueOf(symbol));
+        }
+    }
 
     private void initGUI(boolean oneForEachPlayer) {
-        gameOver = false;
         for (int i = 0; i < (oneForEachPlayer ? controller.getAmountOfPlayers() : 1); i++) {
             JFrame frame = new JFrame("ImprovedTicTacToeVersion-" + i);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -25,16 +50,13 @@ public class View extends JFrame {
 
             final String emptyCellText = String.valueOf(controller.getBoardCell(0,0));
 
-            int rows = controller.getBoardRowLength();
-            int cols = controller.getBoardColumnLength();
-
-            myButtonPanel.setLayout(new GridLayout(rows,cols));
+            myButtonPanel.setLayout(new GridLayout(rows, columns));
 
             JPanel myTextPanel = new JPanel();
             myTextPanel.setLayout(new GridLayout(1,1));
             myTextPanel.setPreferredSize(new Dimension(150,50));
-            JLabel myLabel = new JLabel(controller.getNameOfCurrentPlayer() + "'s turn", SwingConstants.CENTER);
-            myTextPanel.add(myLabel);
+            messageLabels[i] = new JLabel("", SwingConstants.CENTER);
+            myTextPanel.add(messageLabels[i]);
 
             JPanel myMainPanel = new JPanel();
             myMainPanel.setLayout(new BoxLayout(myMainPanel, BoxLayout.Y_AXIS));
@@ -43,48 +65,18 @@ public class View extends JFrame {
 
             frame.getContentPane().add(myMainPanel);
 
-            JButton buttons[][] = new JButton[cols][rows];
             for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < cols; c++) {
+                for (int c = 0; c < columns; c++) {
                     final int _r = r;
                     final int _c = c;
-                    JButton button = buttons[c][r] = new JButton(" ");
+                    JButton button = buttons[i][c][r] = new JButton(" ");
                     button.setPreferredSize(new Dimension(50, 50));
                     button.setText(emptyCellText);
                     button.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            if (oneForEachPlayer) {
-                                boolean wasOutOfSync = false;
-                                for (int row = 0; row < controller.getBoardRowLength(); row++) {
-                                    for (int col = 0; col < controller.getBoardColumnLength(); col++) {
-                                        if ((int)controller.getBoardCell(col,row) == 0) {
-                                            continue;
-                                        }
-
-                                        if (controller.getBoardCell(col, row) != buttons[col][row].getText().charAt(0)) {
-                                            buttons[col][row].setText(String.valueOf(controller.getBoardCell(col, row)));
-                                            myLabel.setText(controller.getNameOfCurrentPlayer() + "'s turn");
-                                            wasOutOfSync = true;
-                                        }
-                                    }
-                                }
-
-                                if (wasOutOfSync) return;
-                            }
-
                             if (gameOver) return;
-                            String formerPlayerSymbol = controller.getSymbolOfCurrentPlayer();
-                            String formerPlayerName = controller.getNameOfCurrentPlayer();
-                            if (controller.makeMove(_c, _r)) {
-                                buttons[_c][_r].setText(formerPlayerSymbol);
-                                if (controller.checkWinner()) {
-                                    myLabel.setText(formerPlayerName + " has won!");
-                                    gameOver = true;
-                                } else {
-                                    myLabel.setText(controller.getNameOfCurrentPlayer() + "'s turn");
-                                }
-                            }
+                            controller.makeMove(_c, _r);
                         }
                     });
                     myButtonPanel.add(button);

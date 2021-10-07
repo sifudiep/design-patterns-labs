@@ -1,9 +1,10 @@
 package lab04;
 
 public class RuleEngine {
-	RuleEngine(int _amountOfPlayers, int _numberInARowToWin, int _boardColumns, int _boardRows) {
-		// Max 2 players
+	RuleEngine(int _amountOfPlayers, int _numberInARowToWin, int _boardColumns, int _boardRows, Controller _controller) {
 		if (_amountOfPlayers > maxPlayers) throw new Error("Players exceeded " + maxPlayers);
+
+		controller = _controller;
 
 		currentPlayerIndex = 0;
 
@@ -21,13 +22,12 @@ public class RuleEngine {
 			throw new Error("ERROR : boardColumns and boardRows is smaller than numberInARowToWin.");
 		}
 	}
+	private Controller controller;
 	private int maxPlayers = 5;
 	public Player[] players;
 	public Board board;
 	private int currentPlayerIndex;
 	private int numberInARowToWin;
-
-	public int getCurrentPlayerIndex() { return currentPlayerIndex; }
 
 	private void nextTurn() {
 		if (currentPlayerIndex + 1 == players.length) {
@@ -37,15 +37,20 @@ public class RuleEngine {
 		}
 	}
 
-	public boolean makeMove(int column, int row) {
-		// Check if move is legal, if move is legal, make move then run nextTurn();
+	public void makeMove(int column, int row) {
 		if (checkMoveIsLegal(column, row)) {
 			board.setBoardCell(column, row, players[currentPlayerIndex].getSymbol());
-			nextTurn();
-			return true;
+			controller.updateBoardButtons(column, row, players[currentPlayerIndex].getSymbol());
+
+			if (checkPlayerHasWon()) {
+				controller.updateBoardText(players[currentPlayerIndex].getName() + " has won the game!");
+				controller.gameIsOver();
+			} else {
+				nextTurn();
+				controller.updateBoardText(players[currentPlayerIndex].getName() + "'s turn");
+			}
 		} else {
-			System.out.println("Move is illegal!");
-			return false;
+			controller.updateBoardText("Move is illegal! " + players[currentPlayerIndex].getName() + "'s turn!");
 		}
 	}
 
