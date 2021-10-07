@@ -36,7 +36,7 @@ public class View extends JFrame {
         gameOver = true;
     }
 
-    public void updateBoardText(String message) {
+    public void updateBoardTextForAllPlayers(String message) {
         for (int i = 0; i < messageLabels.length; i++) {
             messageLabels[i].setText(message);
         }
@@ -46,7 +46,7 @@ public class View extends JFrame {
         messageLabels[playerIndex].setText(message);
     }
     
-    public void updateBoardButton(int column, int row, char symbol) {
+    public void updateBoardButtonForAllPlayers(int column, int row, char symbol) {
         for (int i = 0; i < (oneGUIForEachPlayer ? controller.getAmountOfPlayers() : 1); i++) {
             buttons[i][column][row].setText(String.valueOf(symbol));
         }

@@ -49,17 +49,17 @@ public class RuleEngine {
 			}
 
 			board.setBoardCell(column, row, players[currentPlayerIndex].getSymbol());
-			controller.updateBoardButtonsForAllClients(column, row, players[currentPlayerIndex].getSymbol());
+			controller.updateBoardButtonForAllPlayers(column, row, players[currentPlayerIndex].getSymbol());
 
 			if (checkPlayerHasWon()) {
-				controller.updateBoardTextForAllClients(players[currentPlayerIndex].getName() + " has won the game!");
+				controller.updateBoardTextForAllPlayers(players[currentPlayerIndex].getName() + " has won the game!");
 				controller.gameIsOver();
 			} else {
 				nextTurn();
-				controller.updateBoardTextForAllClients(players[currentPlayerIndex].getName() + "'s turn");
+				controller.updateBoardTextForAllPlayers(players[currentPlayerIndex].getName() + "'s turn");
 			}
 		} else {
-			controller.updateBoardTextForAllClients("Move is illegal! " + players[currentPlayerIndex].getName() + "'s turn!");
+			controller.updateBoardTextForAllPlayers("Move is illegal! " + players[currentPlayerIndex].getName() + "'s turn!");
 		}
 	}
 

@@ -5,18 +5,18 @@ public class Controller {
         ruleEngine = new RuleEngine(2,3,5,5, this);
         view = new View(this, true);
 
-        view.updateBoardText("Player 1's turn!");
+        view.updateBoardTextForAllPlayers("Player 1's turn!");
     }
 
     private View view;
     private RuleEngine ruleEngine;
 
-    public void updateBoardTextForAllClients(String message) {
-        view.updateBoardText(message);
+    public void updateBoardTextForAllPlayers(String message) {
+        view.updateBoardTextForAllPlayers(message);
     }
 
-    public void updateBoardButtonsForAllClients(int column, int row, char symbol) {
-        view.updateBoardButton(column, row, symbol);
+    public void updateBoardButtonForAllPlayers(int column, int row, char symbol) {
+        view.updateBoardButtonForAllPlayers(column, row, symbol);
     }
 
     public void updateBoardTextForOnePlayer(String message, int playerIndex) {
