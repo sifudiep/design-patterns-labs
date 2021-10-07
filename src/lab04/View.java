@@ -7,15 +7,21 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class View extends JFrame {
-    View(Controller _controller, boolean oneGUIForEachPlayer) {
+    View(Controller _controller, boolean _oneGUIForEachPlayer) {
         controller = _controller;
         columns = controller.getBoardColumnLength();
         rows = controller.getBoardRowLength();
-        buttons = new JButton[controller.getAmountOfPlayers()][columns][rows];
-        messageLabels = new JLabel[controller.getAmountOfPlayers()];
+        oneGUIForEachPlayer = _oneGUIForEachPlayer;
+        if (oneGUIForEachPlayer) {
+            messageLabels = new JLabel[controller.getAmountOfPlayers()];
+            buttons = new JButton[controller.getAmountOfPlayers()][columns][rows];
+        }
+        else {
+            messageLabels = new JLabel[1];
+            buttons = new JButton[1][columns][rows];
+        }
 
-        initGUI(oneGUIForEachPlayer);
-
+        initGUI();
     }
 
     private Controller controller;
@@ -24,6 +30,7 @@ public class View extends JFrame {
     private boolean gameOver = false;
     private JLabel messageLabels[];
     private JButton buttons[][][];
+    private boolean oneGUIForEachPlayer;
 
     public void gameIsOver() {
         gameOver = true;
@@ -34,16 +41,20 @@ public class View extends JFrame {
             messageLabels[i].setText(message);
         }
     }
+
+    public void updateBoardTextForOnePlayer(String message, int playerIndex) {
+        messageLabels[playerIndex].setText(message);
+    }
     
     public void updateBoardButton(int column, int row, char symbol) {
-        for (int i = 0; i < controller.getAmountOfPlayers(); i++) {
+        for (int i = 0; i < (oneGUIForEachPlayer ? controller.getAmountOfPlayers() : 1); i++) {
             buttons[i][column][row].setText(String.valueOf(symbol));
         }
     }
 
-    private void initGUI(boolean oneForEachPlayer) {
-        for (int i = 0; i < (oneForEachPlayer ? controller.getAmountOfPlayers() : 1); i++) {
-            JFrame frame = new JFrame("ImprovedTicTacToeVersion-" + i);
+    private void initGUI() {
+        for (int i = 0; i < (oneGUIForEachPlayer ? controller.getAmountOfPlayers() : 1); i++) {
+            JFrame frame = new JFrame(controller.getPlayerName(i));
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             JPanel myButtonPanel = new JPanel();
@@ -69,6 +80,7 @@ public class View extends JFrame {
                 for (int c = 0; c < columns; c++) {
                     final int _r = r;
                     final int _c = c;
+                    final int playerIndex = i;
                     JButton button = buttons[i][c][r] = new JButton(" ");
                     button.setPreferredSize(new Dimension(50, 50));
                     button.setText(emptyCellText);
@@ -76,13 +88,13 @@ public class View extends JFrame {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             if (gameOver) return;
-                            controller.makeMove(_c, _r);
+                            controller.makeMove(_c, _r, playerIndex, oneGUIForEachPlayer);
                         }
                     });
                     myButtonPanel.add(button);
                 }
             }
-
+            System.out.println("i: " + i);
             frame.pack();
             frame.setVisible(true);
         }

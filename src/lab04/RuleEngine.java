@@ -37,20 +37,29 @@ public class RuleEngine {
 		}
 	}
 
-	public void makeMove(int column, int row) {
+	public String getPlayerName(int index) {
+		return players[index].getName();
+	}
+
+	public void makeMove(int column, int row, int playerIndex, boolean multiplePlayers) {
 		if (checkMoveIsLegal(column, row)) {
+			if (playerIndex != currentPlayerIndex && multiplePlayers) {
+				controller.updateBoardTextForOnePlayer("Not your turn! " + players[currentPlayerIndex].getName() + "'s turn!", playerIndex);
+				return;
+			}
+
 			board.setBoardCell(column, row, players[currentPlayerIndex].getSymbol());
-			controller.updateBoardButtons(column, row, players[currentPlayerIndex].getSymbol());
+			controller.updateBoardButtonsForAllClients(column, row, players[currentPlayerIndex].getSymbol());
 
 			if (checkPlayerHasWon()) {
-				controller.updateBoardText(players[currentPlayerIndex].getName() + " has won the game!");
+				controller.updateBoardTextForAllClients(players[currentPlayerIndex].getName() + " has won the game!");
 				controller.gameIsOver();
 			} else {
 				nextTurn();
-				controller.updateBoardText(players[currentPlayerIndex].getName() + "'s turn");
+				controller.updateBoardTextForAllClients(players[currentPlayerIndex].getName() + "'s turn");
 			}
 		} else {
-			controller.updateBoardText("Move is illegal! " + players[currentPlayerIndex].getName() + "'s turn!");
+			controller.updateBoardTextForAllClients("Move is illegal! " + players[currentPlayerIndex].getName() + "'s turn!");
 		}
 	}
 

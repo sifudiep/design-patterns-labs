@@ -2,7 +2,7 @@ package lab04;
 
 public class Controller {
     Controller() {
-        ruleEngine = new RuleEngine(4,3,5,5, this);
+        ruleEngine = new RuleEngine(2,3,5,5, this);
         view = new View(this, true);
 
         view.updateBoardText("Player 1's turn!");
@@ -11,12 +11,16 @@ public class Controller {
     private View view;
     private RuleEngine ruleEngine;
 
-    public void updateBoardText(String message) {
+    public void updateBoardTextForAllClients(String message) {
         view.updateBoardText(message);
     }
 
-    public void updateBoardButtons(int column, int row, char symbol) {
+    public void updateBoardButtonsForAllClients(int column, int row, char symbol) {
         view.updateBoardButton(column, row, symbol);
+    }
+
+    public void updateBoardTextForOnePlayer(String message, int playerIndex) {
+        view.updateBoardTextForOnePlayer(message, playerIndex);
     }
 
     public void gameIsOver() {
@@ -25,6 +29,10 @@ public class Controller {
 
     public int getAmountOfPlayers() {
         return ruleEngine.players.length;
+    }
+
+    public String getPlayerName(int index) {
+        return ruleEngine.getPlayerName(index);
     }
 
     public char getBoardCell(int column, int row) {
@@ -39,8 +47,8 @@ public class Controller {
         return ruleEngine.board.getRowsLength();
     }
 
-    public void makeMove(int column, int row) {
-        ruleEngine.makeMove(column, row);
+    public void makeMove(int column, int row, int playerIndex, boolean multiplePlayers) {
+        ruleEngine.makeMove(column, row, playerIndex, multiplePlayers);
     }
 
     public boolean checkWinner() {
